@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Fraternity Hub</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">FH</div>
+      <div>
+        <div class="brand-title">Fraternity Hub</div>
+        <div class="brand-sub">Communication, availability, points</div>
+      </div>
+    </div>
+
+    <nav class="tabs" role="tablist" aria-label="Navigation tabs">
+      <button class="tab active" data-tab="home" role="tab" aria-selected="true">Home</button>
+      <button class="tab" data-tab="slack" role="tab" aria-selected="false">Slack</button>
+      <button class="tab" data-tab="coffee" role="tab" aria-selected="false">Coffee Chats</button>
+      <button class="tab" data-tab="points" role="tab" aria-selected="false">Points</button>
+      <button class="tab" data-tab="settings" role="tab" aria-selected="false">Settings</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- HOME -->
+    <section id="home" class="panel active" role="tabpanel" aria-hidden="false">
+      <h1>Home</h1>
+      <p class="muted">All chapter coordination in one place (front-end only).</p>
+
+      <div class="grid">
+        <div class="card">
+          <h2>Quick Actions</h2>
+          <div class="actions">
+            <button class="ghost" data-jump="slack">Post to Slack</button>
+            <button class="ghost" data-jump="coffee">Add availability</button>
+            <button class="ghost" data-jump="points">Submit points</button>
+          </div>
+          <div class="divider"></div>
+          <p class="muted small">
+            This demo saves data in your browser (localStorage). When you add a backend later,
+            we’ll swap the storage functions for API calls.
+          </p>
+        </div>
+
+        <div class="card">
+          <h2>At a glance</h2>
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-num" id="statSlack">0</div>
+              <div class="stat-label">Slack drafts</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" id="statCoffee">0</div>
+              <div class="stat-label">Coffee slots</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" id="statPoints">0</div>
+              <div class="stat-label">Point logs</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLACK -->
+    <section id="slack" class="panel" role="tabpanel" aria-hidden="true">
+      <h1>Slack</h1>
+      <p class="muted">
+        Front-end only: this stores “messages” as drafts. Later, a backend can actually send them.
+      </p>
+
+      <div class="grid">
+        <div class="card">
+          <h2>Create message draft</h2>
+          <form id="slackForm">
+            <label>
+              Channel
+              <input name="channel" placeholder="#announcements" required />
+            </label>
+            <label>
+              Message
+              <textarea name="text" placeholder="Type your message..." required></textarea>
+            </label>
+            <button type="submit">Save Draft</button>
+            <div class="status" id="slackStatus"></div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Drafts</h2>
+          <div class="list" id="slackList"></div>
+          <div class="row">
+            <button class="ghost" id="clearSlack">Clear all</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COFFEE -->
+    <section id="coffee" class="panel" role="tabpanel" aria-hidden="true">
+      <h1>Coffee Chat Availability</h1>
+      <p class="muted">Add time slots and view them in a clean list (local-only).</p>
+
+      <div class="grid">
+        <div class="card">
+          <h2>Add availability</h2>
+          <form id="coffeeForm">
+            <label>
+              Name
+              <input name="name" placeholder="Ali" required />
+            </label>
+
+            <div class="row two">
+              <label>
+                Date
+                <input type="date" name="date" required />
+              </label>
+              <label>
+                Location (optional)
+                <input name="location" placeholder="Uglies / Norlin / Zoom" />
+              </label>
+            </div>
+
+            <div class="row two">
+              <label>
+                Start
+                <input type="time" name="startTime" required />
+              </label>
+              <label>
+                End
+                <input type="time" name="endTime" required />
+              </label>
+            </div>
+
+            <button type="submit">Add Slot</button>
+            <div class="status" id="coffeeStatus"></div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Slots</h2>
+          <div class="filters">
+            <input id="coffeeSearch" placeholder="Search by name..." />
+            <select id="coffeeSort">
+              <option value="soonest">Soonest</option>
+              <option value="latest">Latest</option>
+              <option value="name">Name</option>
+            </select>
+          </div>
+          <div class="list" id="coffeeList"></div>
+          <div class="row">
+            <button class="ghost" id="clearCoffee">Clear all</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- POINTS -->
+    <section id="points" class="panel" role="tabpanel" aria-hidden="true">
+      <h1>Points</h1>
+      <p class="muted">Log points per event and show a leaderboard (local-only).</p>
+
+      <div class="grid">
+        <div class="card">
+          <h2>Submit points</h2>
+          <form id="pointsForm">
+            <label>
+              Member name
+              <input name="name" placeholder="Ali" required />
+            </label>
+            <label>
+              Event
+              <input name="event" placeholder="Philanthropy / Chapter / Rush" required />
+            </label>
+
+            <div class="row two">
+              <label>
+                Points
+                <input type="number" name="points" min="0" step="1" required />
+              </label>
+              <label>
+                Date
+                <input type="date" name="date" required />
+              </label>
+            </div>
+
+            <button type="submit">Add Points</button>
+            <div class="status" id="pointsStatus"></div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Leaderboard</h2>
+          <div class="list" id="leaderboard"></div>
+
+          <div class="divider"></div>
+
+          <h2>Recent logs</h2>
+          <div class="list" id="pointsLog"></div>
+
+          <div class="row">
+            <button class="ghost" id="clearPoints">Clear all</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="settings" class="panel" role="tabpanel" aria-hidden="true">
+      <h1>Settings</h1>
+      <p class="muted">Local-only demo controls.</p>
+
+      <div class="card">
+        <h2>Reset all data</h2>
+        <p class="muted small">This clears Slack drafts, coffee slots, and points logs.</p>
+        <button id="resetAll" class="danger">Reset</button>
+        <div class="status" id="settingsStatus"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span class="muted small">Front-end demo • stored in your browser</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
