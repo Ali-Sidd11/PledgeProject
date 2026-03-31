@@ -176,3 +176,60 @@ button.danger:hover{background:rgba(255,77,77,.26)}
 }
 .filters input{flex:2; min-width:180px}
 .filters select{flex:1; min-width:140px}
+
+.calendar-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.calendar-head h2{margin:0; text-align:center; flex:1}
+
+.calendar-weekdays{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:6px;
+  margin-bottom:6px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.calendar-weekdays div{text-align:center}
+
+.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:6px;
+}
+
+.calendar-empty{
+  min-height:44px;
+}
+
+.calendar-day{
+  min-height:44px;
+  margin:0;
+  padding:8px 6px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:rgba(11,13,18,.45);
+  color:var(--text);
+  position:relative;
+}
+
+.calendar-day.selected{
+  border-color:rgba(124,92,255,.65);
+  background:rgba(124,92,255,.25);
+}
+
+.calendar-dot{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#38bdf8;
+  position:absolute;
+  right:8px;
+  bottom:8px;
+}

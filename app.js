@@ -15,13 +15,15 @@ const store = {
     localStorage.removeItem("slackDrafts");
     localStorage.removeItem("coffeeSlots");
     localStorage.removeItem("pointsLogs");
+    localStorage.removeItem("calendarEvents");
   }
 };
 
 const KEYS = {
   slack: "slackDrafts",
   coffee: "coffeeSlots",
-  points: "pointsLogs"
+  points: "pointsLogs",
+  calendar: "calendarEvents"
 };
 
 // ---------- Tabs ----------
@@ -249,6 +251,144 @@ clearCoffee?.addEventListener("click", () => {
 coffeeSearch?.addEventListener("input", renderCoffee);
 coffeeSort?.addEventListener("change", renderCoffee);
 
+// ---------- Calendar ----------
+const calendarGrid = document.getElementById("calendarGrid");
+const calendarMonthLabel = document.getElementById("calendarMonthLabel");
+const calendarSelectedDateEl = document.getElementById("calendarSelectedDate");
+const calendarEventsList = document.getElementById("calendarEventsList");
+const calendarForm = document.getElementById("calendarForm");
+const calendarStatus = document.getElementById("calendarStatus");
+const calendarPrevMonth = document.getElementById("calendarPrevMonth");
+const calendarNextMonth = document.getElementById("calendarNextMonth");
+const clearCalendarDay = document.getElementById("clearCalendarDay");
+
+let calendarMonth = new Date();
+calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1);
+let calendarSelectedDate = todayISO();
+
+function monthLabel(d) {
+  return d.toLocaleString(undefined, { month: "long", year: "numeric" });
+}
+
+function isoForDate(y, m, day) {
+  const mm = String(m + 1).padStart(2, "0");
+  const dd = String(day).padStart(2, "0");
+  return `${y}-${mm}-${dd}`;
+}
+
+function getCalendarEvents() {
+  return store.get(KEYS.calendar, []);
+}
+
+function renderCalendarEventsForSelectedDay() {
+  if (!calendarSelectedDateEl || !calendarEventsList) return;
+  calendarSelectedDateEl.textContent = calendarSelectedDate;
+  const events = getCalendarEvents()
+    .filter(e => e.date === calendarSelectedDate)
+    .sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+
+  if (!events.length) {
+    calendarEventsList.innerHTML = `<div class="muted small">No events for this day.</div>`;
+    return;
+  }
+
+  calendarEventsList.innerHTML = events.map(e => `
+    <div class="item">
+      <div class="item-main">
+        <div class="item-title">${escapeHtml(e.title)}</div>
+        <div class="item-meta">${escapeHtml(e.time)} • ${escapeHtml(e.location)}</div>
+      </div>
+      <div class="item-actions">
+        <button class="icon-btn" data-action="deleteCalendarEvent" data-id="${e.id}">Remove</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderCalendar() {
+  if (!calendarGrid || !calendarMonthLabel) return;
+
+  const year = calendarMonth.getFullYear();
+  const month = calendarMonth.getMonth();
+  const firstWeekday = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const events = getCalendarEvents();
+
+  calendarMonthLabel.textContent = monthLabel(calendarMonth);
+  calendarGrid.innerHTML = "";
+
+  for (let i = 0; i < firstWeekday; i++) {
+    calendarGrid.insertAdjacentHTML("beforeend", `<div class="calendar-empty"></div>`);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const iso = isoForDate(year, month, day);
+    const hasEvent = events.some(e => e.date === iso);
+    const selectedClass = iso === calendarSelectedDate ? " selected" : "";
+    const marker = hasEvent ? `<span class="calendar-dot" aria-hidden="true"></span>` : "";
+    calendarGrid.insertAdjacentHTML(
+      "beforeend",
+      `<button class="calendar-day${selectedClass}" data-date="${iso}" type="button">${day}${marker}</button>`
+    );
+  }
+
+  renderCalendarEventsForSelectedDay();
+}
+
+calendarGrid?.addEventListener("click", (e) => {
+  const btn = e.target.closest("button.calendar-day");
+  if (!btn) return;
+  calendarSelectedDate = String(btn.dataset.date || calendarSelectedDate);
+  renderCalendar();
+});
+
+calendarPrevMonth?.addEventListener("click", () => {
+  calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1);
+  renderCalendar();
+});
+
+calendarNextMonth?.addEventListener("click", () => {
+  calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1);
+  renderCalendar();
+});
+
+calendarForm?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const form = new FormData(calendarForm);
+  const event = {
+    id: uid(),
+    date: calendarSelectedDate,
+    title: String(form.get("title") || "").trim(),
+    time: String(form.get("time") || "").trim(),
+    location: String(form.get("location") || "").trim(),
+    createdAt: Date.now()
+  };
+
+  const events = getCalendarEvents();
+  events.push(event);
+  store.set(KEYS.calendar, events);
+
+  calendarForm.reset();
+  setStatus(calendarStatus, "✅ Event added.");
+  renderCalendar();
+});
+
+calendarEventsList?.addEventListener("click", (e) => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+  if (btn.dataset.action !== "deleteCalendarEvent") return;
+  const id = btn.dataset.id;
+  const events = getCalendarEvents();
+  store.set(KEYS.calendar, events.filter(ev => ev.id !== id));
+  renderCalendar();
+});
+
+clearCalendarDay?.addEventListener("click", () => {
+  const events = getCalendarEvents();
+  store.set(KEYS.calendar, events.filter(ev => ev.date !== calendarSelectedDate));
+  renderCalendar();
+});
+
 // ---------- Points ----------
 const pointsForm = document.getElementById("pointsForm");
 const pointsStatus = document.getElementById("pointsStatus");
@@ -375,6 +515,7 @@ function updateStats() {
 
   renderSlack();
   renderCoffee();
+  renderCalendar();
   renderPoints();
   updateStats();
 })();
