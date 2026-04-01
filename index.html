@@ -20,6 +20,7 @@
       <button class="tab active" data-tab="home" role="tab" aria-selected="true">Home</button>
       <button class="tab" data-tab="slack" role="tab" aria-selected="false">Slack</button>
       <button class="tab" data-tab="coffee" role="tab" aria-selected="false">Coffee Chats</button>
+      <button class="tab" data-tab="calendar" role="tab" aria-selected="false">Events</button>
       <button class="tab" data-tab="points" role="tab" aria-selected="false">Points</button>
       <button class="tab" data-tab="settings" role="tab" aria-selected="false">Settings</button>
     </nav>
@@ -29,7 +30,7 @@
     <!-- HOME -->
     <section id="home" class="panel active" role="tabpanel" aria-hidden="false">
       <h1>Home</h1>
-      <p class="muted">All chapter coordination in one place (front-end only).</p>
+      <p class="muted">All chapter coordination in one place.</p>
 
       <div class="grid">
         <div class="card">
@@ -37,6 +38,7 @@
           <div class="actions">
             <button class="ghost" data-jump="slack">Post to Slack</button>
             <button class="ghost" data-jump="coffee">Add availability</button>
+            <button class="ghost" data-jump="calendar">Add event</button>
             <button class="ghost" data-jump="points">Submit points</button>
           </div>
           <div class="divider"></div>
@@ -70,7 +72,7 @@
     <section id="slack" class="panel" role="tabpanel" aria-hidden="true">
       <h1>Slack</h1>
       <p class="muted">
-        Front-end only: this stores “messages” as drafts. Later, a backend can actually send them.
+        this stores “messages” as drafts. Later, a backend can actually send them.
       </p>
 
       <div class="grid">
@@ -159,6 +161,58 @@
       </div>
     </section>
 
+    <!-- EVENTS -->
+    <section id="calendar" class="panel" role="tabpanel" aria-hidden="true">
+      <h1>Events</h1>
+      <p class="muted">Click a day, then add an event with a time and location.</p>
+
+      <div class="grid">
+        <div class="card">
+          <div class="calendar-head">
+            <button type="button" class="ghost icon-btn" id="calendarPrevMonth">← Prev</button>
+            <h2 id="calendarMonthLabel">Month Year</h2>
+            <button type="button" class="ghost icon-btn" id="calendarNextMonth">Next →</button>
+          </div>
+
+          <div class="calendar-weekdays">
+            <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+
+        <div class="card">
+          <h2>Add event</h2>
+          <div class="muted small">Selected day: <span id="calendarSelectedDate">-</span></div>
+          <form id="calendarForm">
+            <label>
+              Event
+              <input name="title" placeholder="Chapter meeting" required />
+            </label>
+            <div class="row two">
+              <label>
+                Time
+                <input type="time" name="time" required />
+              </label>
+              <label>
+                Location
+                <input name="location" placeholder="House / UMC / Zoom" required />
+              </label>
+            </div>
+            <button type="submit">Add Event</button>
+            <div class="status" id="calendarStatus"></div>
+          </form>
+
+          <div class="divider"></div>
+
+          <h2>Events on selected day</h2>
+          <div class="list" id="calendarEventsList"></div>
+          <div class="row">
+            <button class="ghost" id="clearCalendarDay">Clear selected day</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- POINTS -->
     <section id="points" class="panel" role="tabpanel" aria-hidden="true">
       <h1>Points</h1>
@@ -170,11 +224,22 @@
           <form id="pointsForm">
             <label>
               Member name
-              <input name="name" placeholder="Ali" required />
+              <select name="name" required>
+                <option value="" disabled selected>Select member</option>
+                <option value="Shree">Shree</option>
+                <option value="Ali">Ali</option>
+                <option value="Riley">Riley</option>
+                <option value="Luke">Luke</option>
+              </select>
             </label>
             <label>
               Event
-              <input name="event" placeholder="Philanthropy / Chapter / Rush" required />
+              <select name="event" required>
+                <option value="" disabled selected>Select event</option>
+                <option value="Philanthropy">Philanthropy</option>
+                <option value="Chapter">Chapter</option>
+                <option value="Rush">Rush</option>
+              </select>
             </label>
 
             <div class="row two">
@@ -224,7 +289,7 @@
   </main>
 
   <footer class="footer">
-    <span class="muted small">Front-end demo • stored in your browser</span>
+    <span class="muted small">• stored in your browser</span>
   </footer>
 
   <script src="app.js"></script>
